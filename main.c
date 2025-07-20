@@ -7,22 +7,34 @@
 #define P3 3*PI/2
 #define DR 0.01745329 // one degree in radians
 
-
 typedef struct{
     int w,a,d,s;
 }ButtonKeys;ButtonKeys Keys;
 
-int mapX=8,mapY=8,mapS=64;
+int mapX=16,mapY=16,mapS=64;
+int mapScaleDown = 4;
+const int WINDOW_HEIGHT = 1080;
+const int WINDOW_WIDTH = 1920;
+int ScreenScaleX = 4.0;
+int ScreenScaleY = 4.0;
 int mapW[] = 
 {
-    1,1,1,1,1,2,1,1,
-    1,0,1,0,0,0,0,1,
-    1,0,1,0,0,0,1,1,
-    1,0,1,1,0,0,0,1,
-    3,0,0,0,0,0,0,1,
-    3,2,4,2,0,1,0,1,
-    1,0,0,0,0,0,0,1,
-    1,1,3,2,1,1,1,1,
+    1,1,1,1,1,2,1,1, 1,1,1,1,1,1,1,1,
+    1,0,1,0,0,0,0,1, 0,0,0,0,0,0,0,1,
+    1,0,1,0,0,0,1,1, 0,0,0,0,0,0,0,1,
+    1,0,1,1,0,0,0,4, 0,0,0,0,0,0,0,1,
+    3,0,0,0,0,0,0,1, 0,0,0,0,0,0,0,1,
+    3,2,4,2,0,1,0,1, 0,0,0,0,0,0,0,3,
+    1,0,0,0,0,0,0,1, 0,0,0,0,0,0,0,3,
+    1,1,3,2,0,0,1,1, 0,0,0,0,0,0,0,3,
+    1,1,1,1,0,0,1,1, 0,0,0,0,0,0,0,3,
+    1,0,1,0,0,0,0,0, 0,0,0,0,0,0,0,3,
+    1,0,1,0,0,0,1,1, 0,0,0,0,0,0,0,3,
+    1,0,1,1,0,0,0,1, 0,0,0,0,0,0,0,3,
+    3,0,0,0,0,0,0,1, 0,0,0,0,0,0,0,3,
+    3,2,4,2,0,1,0,0, 0,0,0,0,0,0,0,2,
+    1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,1,
+    1,1,3,2,1,1,1,1, 1,2,2,2,2,2,2,1,
 };
 
 int mapF[] = 
@@ -32,7 +44,7 @@ int mapF[] =
     0,0,1,0,2,0,1,0,
     0,0,1,1,0,0,0,0,
     0,0,0,0,0,2,2,0,
-    0,2,4,2,0,1,2,0,
+    0,2,2,2,0,1,2,0,
     0,0,0,0,0,3,1,0,
     0,0,0,0,0,0,0,0,
 };
@@ -44,7 +56,7 @@ int mapC[] =
     0,0,1,0,2,0,1,0,
     0,0,1,1,0,0,0,0,
     0,0,0,0,0,2,2,0,
-    0,2,4,2,0,1,2,0,
+    0,2,3,2,0,1,2,0,
     0,0,0,0,0,3,1,0,
     0,0,0,0,0,0,0,0,
 };
@@ -208,13 +220,13 @@ void drawPlayer(){
     glColor3f(1 , 1 , 0);
     glPointSize(8);
     glBegin(GL_POINTS);
-    glVertex2i(px , py);
+    glVertex2i(px/mapScaleDown , py/mapScaleDown);
     glEnd();
 
     glLineWidth(3);
     glBegin(GL_LINES);
-    glVertex2i(px , py);
-    glVertex2i(px+pdx*20 , py+pdy*20);
+    glVertex2i(px/mapScaleDown , py/mapScaleDown);
+    glVertex2i((px+pdx*20)/mapScaleDown , (py+pdy*20)/mapScaleDown);
     glEnd();
 }
 
@@ -227,12 +239,12 @@ void drawMap2D(){
     for ( y=0 ; y<mapY ; y++){
         for(x=0;x<mapX;x++){
             if(mapW[y*mapX+x]>0){glColor3f(1,1,1);} else { glColor3f(0,0,0); }
-            xo = x*mapS; yo = y*mapS;
+            xo = x*mapS/mapScaleDown; yo = y*mapS/mapScaleDown;
             glBegin(GL_QUADS);
             glVertex2i(xo     +1, yo     +1);
-            glVertex2i(xo     +1, yo+mapS-1);
-            glVertex2i(xo+mapS-1, yo+mapS-1);
-            glVertex2i(xo+mapS-1, yo     +1);
+            glVertex2i(xo     +1, yo+(mapS-1)/mapScaleDown);
+            glVertex2i(xo+(mapS-1)/mapScaleDown, yo+(mapS-1)/mapScaleDown);
+            glVertex2i(xo+(mapS-1)/mapScaleDown, yo     +1);
             glEnd();
         }
     }
@@ -240,8 +252,8 @@ void drawMap2D(){
 
 void drawRays3D(){
 
-    glColor3f(0,1,1);glBegin(GL_QUADS);glVertex2i(526,0);glVertex2i(1006,0);glVertex2i(1006,160);glVertex2i(526,160);
-    glColor3f(0,1,0);glBegin(GL_QUADS);glVertex2i(526,160);glVertex2i(1006,160);glVertex2i(1006,320);glVertex2i(526,320);
+    // glColor3f(0,1,1);glBegin(GL_QUADS);glVertex2i(526,0);glVertex2i(1006,0);glVertex2i(1006,160);glVertex2i(526,160);
+    // glColor3f(0,1,0);glBegin(GL_QUADS);glVertex2i(526,160);glVertex2i(1006,160);glVertex2i(1006,320);glVertex2i(526,320);
 
     int r , mx , my , mp, dof; float rx,ry,ra,xo,yo,disT;
     ra=pa - DR*30; if(ra < 0){ra+=2*PI;} if(ra > 2*PI){ra-=2*PI;}
@@ -255,11 +267,11 @@ void drawRays3D(){
         float aTan=-1/tan(ra);
         if(ra > PI){ ry=(((int)py >> 6) << 6)-0.0001; rx=(py-ry)*aTan+px; yo=-64 ; xo=-yo*aTan;}//looking up
         if(ra < PI){ ry=(((int)py >> 6) << 6)+64    ; rx=(py-ry)*aTan+px; yo= 64 ; xo=-yo*aTan;}//looking down
-        if(ra==0 || ra==PI){ rx=px; ry=py; dof=8;}//looking straight left or right
-        while(dof<8)
+        if(ra==0 || ra==PI){ rx=px; ry=py; dof=16;}//looking straight left or right
+        while(dof<16)
         {
             mx=(int) (rx)>>6; my=(int)(ry) >> 6; mp=my*mapX+mx;
-            if(mp>0 && mp<mapX*mapY && mapW[mp]>0){ hmt=mapW[mp]-1; hx=rx ; hy=ry; disH=dist(px,py,hx,hy,ra) ; dof = 8;} //hit wall
+            if(mp>0 && mp<mapX*mapY && mapW[mp]>0){ hmt=mapW[mp]-1; hx=rx ; hy=ry; disH=dist(px,py,hx,hy,ra) ; dof = 16;} //hit wall
             else{ rx+=xo; ry+=yo; dof+=1;}//next line
         }
         
@@ -271,17 +283,17 @@ void drawRays3D(){
         if(ra > P2 && ra<P3){ rx=(((int)px >> 6) << 6)-0.0001; ry=(px-rx)*nTan+py; xo=-64 ; yo=-xo*nTan;}//looking left
         if(ra < P2 || ra>P3){ rx=(((int)px >> 6) << 6)+64    ; ry=(px-rx)*nTan+py; xo= 64 ; yo=-xo*nTan;}//looking right
         if(ra==P2 || ra==P3){ rx=px; ry=py; dof=8;}//looking straight up or down
-        while(dof<8)
+        while(dof<16)
         {
             mx=(int) (rx)>>6; my=(int)(ry) >> 6; mp=my*mapX+mx;
-            if(mp>0 && mp<mapX*mapY && mapW[mp]>0){ vmt=mapW[mp]-1; vx=rx ; vy=ry; disV=dist(px,py,vx,vy,ra) ; dof = 8;} //hit wall
+            if(mp>0 && mp<mapX*mapY && mapW[mp]>0){ vmt=mapW[mp]-1; vx=rx ; vy=ry; disV=dist(px,py,vx,vy,ra) ; dof = 16;} //hit wall
             else{ rx+=xo; ry+=yo; dof+=1;}//next line
         }
         float shade=1;
         
         if(disV < disH){ hmt=vmt; shade=0.5 , rx=vx ; ry=vy; disT=disV;glColor3f(0.9,0,0);}        //vertical   wall hit
         if(disH < disV){ rx=hx ; ry=hy; disT=disH;glColor3f(0.5,0,0);}        //horizontal wall hit
-        glLineWidth(3);glBegin(GL_LINES);glVertex2i(px,py);glVertex2d(rx,ry);glEnd();
+        glLineWidth(3);glBegin(GL_LINES);glVertex2i(px/mapScaleDown,py/mapScaleDown);glVertex2d(rx/mapScaleDown,ry/mapScaleDown);glEnd();
         //--Draw 3D Walls--
         float ca=pa-ra; if(ca < 0){ca+=2*PI;} if(ca > 2*PI){ca-=2*PI;} disT=disT*cos(ca); //fix fisheye
         float lineH=(mapS*320)/disT; 
@@ -303,7 +315,7 @@ void drawRays3D(){
             if(hmt==1){ glColor3f(c    ,c    ,c/2.0);} //yellow bricks
             if(hmt==2){ glColor3f(c/2.0,c/2.0,c    );} //blue window
             if(hmt==3){ glColor3f(c/2.0,c    ,c/2.0);} //green door
-            glPointSize(1);glBegin(GL_POINTS);glVertex2i(r+526,y+lineO);glEnd();
+            glPointSize(3.5);glBegin(GL_POINTS);glVertex2i(r*ScreenScaleX,(y+lineO)*ScreenScaleY);glEnd();
             ty+=ty_step;
         }
 
@@ -314,12 +326,12 @@ void drawRays3D(){
             ty=py/2 + sin(deg)*158*32/dy/raFix;
             int mp = mapF[(int)(ty/32.0)*mapX + (int)(tx/32.0)]*32*32;
             float c=All_Textures[((int)(ty)&31)*32 + ((int)(tx)&31)+mp]*0.7;
-            glColor3f(c,c,c);glPointSize(1);glBegin(GL_POINTS);glVertex2i(r+526,y);glEnd();
+            glColor3f(c,c,c);glPointSize(3.5);glBegin(GL_POINTS);glVertex2i(r*ScreenScaleX,y*ScreenScaleY);glEnd();
 
             //ceiling
             mp = mapC[(int)(ty/32.0)*mapX + (int)(tx/32.0)]*32*32;
             c=All_Textures[((int)(ty)&31)*32 + ((int)(tx)&31)+mp]*0.7;
-            glColor3f(c,c,c);glPointSize(1);glBegin(GL_POINTS);glVertex2i(r+526,320-y);glEnd();
+            glColor3f(c,c,c);glPointSize(3.5);glBegin(GL_POINTS);glVertex2i(r*ScreenScaleX,(320-y)*ScreenScaleY);glEnd();
 
         }
 
@@ -349,15 +361,15 @@ void display(){
     }
     if(Keys.w == 1){ 
         if(mapW[ipy*mapX        + ipx_add_xo]==0) {px+= pdx* 0.02 * fps;} 
-        if(mapW[ipy_add_yo*mapX + ipx       ]==0){py+=pdy* 0.02 * fps;}
+        if(mapW[ipy_add_yo*mapX + ipx       ]==0) {py+= pdy* 0.02 * fps;}
     }
 
     glutPostRedisplay();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    drawRays3D();
     drawMap2D();
     drawPlayer();
-    drawRays3D();
     glutSwapBuffers();
 }
 
@@ -368,11 +380,11 @@ void ButtonDown(unsigned char key , int x , int y){
     if(key=='d'){ Keys.d=1;}
     if(key=='e')    //open door
     {
-    int xo=0; if(pdx<0){ xo-=25; } else { xo=25; }
-    int yo=0; if(pdy<0){ yo-=25; } else { yo=25; }
-    int ipx=px/64.0, ipx_add_xo=(px+xo)/64.0;
-    int ipy=py/64.0, ipy_add_yo=(py+yo)/64.0;
-    if(mapW[ipy_add_yo*mapX+ipx_add_xo]==4) { mapW[ipy_add_yo*mapX+ipx_add_xo]=0;}   
+        int xo=0; if(pdx<0){ xo-=25; } else { xo=25;}
+        int yo=0; if(pdy<0){ yo-=25; } else { yo=25;}
+        int ipx=px/64.0, ipx_add_xo=(px+xo)/64.0;
+        int ipy=py/64.0, ipy_add_yo=(py+yo)/64.0;
+        if(mapW[ipy_add_yo*mapX+ipx_add_xo]==4) { mapW[ipy_add_yo*mapX+ipx_add_xo]=0;}   
     }
     glutPostRedisplay();
 }
@@ -387,19 +399,19 @@ void ButtonUp(unsigned char key , int x , int y){
 
 void init(){
     glClearColor(0.3 , 0.3 , 0.3 , 0);
-    gluOrtho2D(0, 1024 , 512 , 0);
+    gluOrtho2D(0, WINDOW_WIDTH , WINDOW_HEIGHT, 0);
     px = 300 ; py = 300; pdx=cos(pa)*5; pdy=sin(pa)*5;
 }
 
 void resize(int w , int h){
-    glutReshapeWindow(1024 , 512);
+    glutReshapeWindow(WINDOW_WIDTH , WINDOW_HEIGHT);
 }
 
 int main(int argc, char* argv[]){
     glutInit(&argc , argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowSize(1024 , 512);
-    glutInitWindowPosition(200,200);
+    glutInitWindowSize(WINDOW_WIDTH , WINDOW_HEIGHT);
+    glutInitWindowPosition(0,0);
     glutCreateWindow("Ritesh!");
     init();
     glutDisplayFunc(display);
