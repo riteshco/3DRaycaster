@@ -25,6 +25,30 @@ int mapW[] =
     1,1,3,2,1,1,1,1,
 };
 
+int mapF[] = 
+{
+    0,0,0,0,0,0,0,0,
+    0,0,1,0,1,1,0,0,
+    0,0,1,0,2,0,1,0,
+    0,0,1,1,0,0,0,0,
+    0,0,0,0,0,2,2,0,
+    0,2,4,2,0,1,2,0,
+    0,0,0,0,0,3,1,0,
+    0,0,0,0,0,0,0,0,
+};
+
+int mapC[] = 
+{
+    0,0,0,0,0,0,0,0,
+    0,0,1,0,1,1,0,0,
+    0,0,1,0,2,0,1,0,
+    0,0,1,1,0,0,0,0,
+    0,0,0,0,0,2,2,0,
+    0,2,4,2,0,1,2,0,
+    0,0,0,0,0,3,1,0,
+    0,0,0,0,0,0,0,0,
+};
+
 int All_Textures[] = {
     //Checkerboard
     0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,  
@@ -284,9 +308,20 @@ void drawRays3D(){
         }
 
         //draw floor
-        // for(y=lineO+lineH;y<320;y++){
-        //     float dy=y-(320/2.0), deg=ra , raFix(cos(FixAng(pa-ra)))
-        // }
+        for(y=lineO+lineH;y<321;y++){
+            float dy=y-(320/2.0), deg=ra , raFix=cos(FixAng(pa-ra));
+            tx=px/2 + cos(deg)*158*32/dy/raFix;
+            ty=py/2 + sin(deg)*158*32/dy/raFix;
+            int mp = mapF[(int)(ty/32.0)*mapX + (int)(tx/32.0)]*32*32;
+            float c=All_Textures[((int)(ty)&31)*32 + ((int)(tx)&31)+mp]*0.7;
+            glColor3f(c,c,c);glPointSize(1);glBegin(GL_POINTS);glVertex2i(r+526,y);glEnd();
+
+            //ceiling
+            mp = mapC[(int)(ty/32.0)*mapX + (int)(tx/32.0)]*32*32;
+            c=All_Textures[((int)(ty)&31)*32 + ((int)(tx)&31)+mp]*0.7;
+            glColor3f(c,c,c);glPointSize(1);glBegin(GL_POINTS);glVertex2i(r+526,320-y);glEnd();
+
+        }
 
         ra+=DR/8.0; if(ra < 0){ra+=2*PI;} if(ra > 2*PI){ra-=2*PI;}
     }
